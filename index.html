@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kesafin Clicker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #111122 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header {
+            text-align: center;
+            width: 100%;
+        }
+
+        .title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00ff88, #00cc66, #009944);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            margin-bottom: 6px;
+            letter-spacing: 1.5px;
+            animation: shimmer 4s infinite linear;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #88ffaa;
+            opacity: 0.8;
+            letter-spacing: 0.8px;
+        }
+
+        .stats-container {
+            width: 100%;
+            background: rgba(10, 30, 20, 0.4);
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid rgba(0, 255, 136, 0.15);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            padding: 0 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            margin-bottom: 3px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #aaffcc;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            opacity: 0.8;
+        }
+
+        .stat-divider {
+            width: 1px;
+            height: 35px;
+            background: rgba(0, 255, 136, 0.15);
+        }
+
+        .progress-section {
+            width: 100%;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: #aaffcc;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(20, 40, 30, 0.5);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00aa55, #00ff88, #00ff88);
+            width: 0%;
+            transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.4), 
+                transparent);
+            animation: shine 3s infinite;
+        }
+
+
+.card-section {
+            width: 100%;
+            position: relative;
+        }
+
+        .card-container {
+            position: relative;
+            width: 280px;
+            height: 170px;
+            perspective: 1200px;
+            cursor: pointer;
+            margin: 0 auto 10px;
+        }
+
+        .bank-card {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a4430 0%, #2a6644 100%);
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 255, 136, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 18px;
+            transform-style: preserve-3d;
+        }
+
+        .bank-card:hover {
+            transform: translateY(-3px) rotateX(5deg);
+            box-shadow: 0 12px 30px rgba(0, 255, 136, 0.15);
+        }
+
+        .bank-card:active {
+            transform: scale(0.96) rotateX(-2deg);
+            transition: transform 0.1s;
+        }
+
+        .click-effect {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.6) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            z-index: 5;
+        }
+
+        .card-chip {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border-radius: 5px;
+            position: relative;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transform-style: preserve-3d;
+        }
+
+        .card-chip::before {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 2.2px;
+            color: #ffffff;
+            margin: 10px 0;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-holder {
+            font-size: 0.75rem;
+            color: #ccffdd;
+            margin-top: 6px;
+            opacity: 0.9;
+        }
+
+        .card-logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00ff88;
+            text-align: right;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+        }
+
+        .click-hint {
+            font-size: 0.85rem;
+            color: #88ffaa;
+            text-align: center;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        .level-up-notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 800;
+            color: #00ff88;
+            text-shadow: 0 0 25px rgba(0, 255, 136, 0.9);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+            white-space: nowrap;
+        }
+
+        .coin-animation {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+            filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.8));
+        }
+
+        .footer {
+            margin-top: 5px;
+            font-size: 0.7rem;
+            color: #668877;
+            text-align: center;
+            opacity: 0.5;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: 200px 0;
+            }
+        }
+
+
+@keyframes shine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes coin-spin {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-40px) rotate(180deg) scale(1.2);
+            }
+            100% {
+                transform: translateY(-80px) rotate(360deg) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0.1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes card-press {
+            0% {
+                transform: scale(1) rotateX(0);
+            }
+            50% {
+                transform: scale(0.96) rotateX(-5deg);
+            }
+            100% {
+                transform: scale(1) rotateX(0);
+            }
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 255, 136, 0.7);
+            }
+        }
+
+        @keyframes level-up {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+            }
+            40% {
+                transform: translate(-50%, -50%) scale(1) rotate(0);
+            }
+            60% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1) rotate(3deg);
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.4) rotate(10deg);
+            }
+        }
+
+        .card-press {
+            animation: card-press 0.3s ease;
+        }
+
+        .card-glow {
+            animation: glow-pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">KESAFIN</h1>
+            <p class="subtitle">кликай и зарабатывай</p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="coinCounter">0</div>
+                    <div class="stat-label">Монеты</div>
+                </div>
+                
+                <div class="stat-divider"></div>
+                
+                <div class="stat-item">
+                    <div class="stat-value" id="levelCounter">1</div>
+                    <div class="stat-label">Уровень</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-info">
+                <span>Прогресс до уровня</span>
+                <span id="progressText">0/10</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="card-section">
+            <div class="card-container" id="cardContainer">
+                <div class="bank-card" id="bankCard">
+                    <div class="card-chip"></div>
+                    <div class="card-number">●●●● ●●●● ●●●● 2025</div>
+                    <div class="card-holder">K E S A F I N • C L I C K E R</div>
+                    <div class="card-logo">KESAFIN</div>
+                </div>
+                <div class="level-up-notification" id="levelUpEffect">Уровень UP!</div>
+            </div>
+            <p class="click-hint">Кликайте по карте для получения монет</p>
+        </div>
+
+wyvak, [02.12.2025 22:24]
+<div class="footer">
+            Kesafin Clicker © 2023
+        </div>
+    </div>
+
+    <script>
+        // Сложная система прогресса уровня
+        class LevelSystem {
+            constructor() {
+                this.level = 1;
+                this.currentXP = 0;
+                this.xpForNextLevel = this.calculateXPForLevel(1);
+                this.coinsPerClick = 1;
+                this.xpPerClick = 1;
+                this.coins = 0;
+                this.totalClicks = 0;
+                this.levelBonuses = [];
+            }
+            
+            calculateXPForLevel(level) {
+                // Сложная формула прогрессии: квадратичный рост с дополнительной сложностью
+                return Math.floor(10 + (level * 5) + (Math.pow(level, 1.5) * 2));
+            }
+            
+            addXP(amount) {
+                this.currentXP += amount;
+                this.totalClicks++;
+                
+                // Проверка повышения уровня
+                while (this.currentXP >= this.xpForNextLevel && this.level < 100) {
+                    this.currentXP -= this.xpForNextLevel;
+                    this.levelUp();
+                }
+                
+                return this.checkLevelUp();
+            }
+            
+            levelUp() {
+                this.level++;
+                
+                // Увеличиваем сложность для следующего уровня
+                this.xpForNextLevel = this.calculateXPForLevel(this.level);
+                
+                // Увеличиваем доход за клик
+                const oldCPC = this.coinsPerClick;
+                this.coinsPerClick = Math.floor(1 + (this.level * 0.4) + (Math.pow(this.level, 0.7) * 0.2));
+                
+                // Увеличиваем XP за клик
+                this.xpPerClick = Math.max(1, Math.floor(this.level / 5) + 1);
+                
+                // Бонус за уровень
+                const levelBonus = {
+                    level: this.level,
+                    coinsBonus: this.coinsPerClick * 15,
+                    cpcIncrease: this.coinsPerClick - oldCPC
+                };
+                
+                this.levelBonuses.push(levelBonus);
+                this.coins += levelBonus.coinsBonus;
+                
+                return levelBonus;
+            }
+            
+            checkLevelUp() {
+                return this.currentXP >= this.xpForNextLevel;
+            }
+            
+            getProgressPercent() {
+                return (this.currentXP / this.xpForNextLevel) * 100;
+            }
+            
+            addCoins(amount) {
+                this.coins += amount;
+            }
+        }
+
+        // Инициализация игры
+        const levelSystem = new LevelSystem();
+        
+        // Элементы DOM
+        const coinCounter = document.getElementById('coinCounter');
+        const levelCounter = document.getElementById('levelCounter');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const bankCard = document.getElementById('bankCard');
+        const cardContainer = document.getElementById('cardContainer');
+        const levelUpEffect = document.getElementById('levelUpEffect');
+
+        // Форматирование чисел
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(2) + 'K';
+            return num;
+        }
+
+        // Обновление интерфейса
+        function updateUI() {
+            coinCounter.textContent = formatNumber(levelSystem.coins);
+            levelCounter.textContent = levelSystem.level;
+            
+            // Прогресс-бар
+            const progressPercent = levelSystem.getProgressPercent();
+            progressFill.style.width = ${progressPercent}%;
+            progressText.textContent = ${levelSystem.currentXP}/${levelSystem.xpForNextLevel};
+        }
+
+
+// Новая анимация при клике
+        function createClickAnimation(x, y) {
+            // Эффект ряби
+            const ripple = document.createElement('div');
+            ripple.className = 'click-effect';
+            ripple.style.left = ${x - 25}px;
+            ripple.style.top = ${y - 25}px;
+            ripple.style.animation = 'ripple 0.6s ease-out forwards';
+            
+            cardContainer.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+            
+            // Эффект частиц
+            const particles = 5;
+            for (let i = 0; i < particles; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'coin-animation';
+                    
+                    const angle = (Math.PI * 2 / particles) * i;
+                    const distance = 30 + Math.random() * 20;
+                    
+                    const particleX = x + Math.cos(angle) * distance - 15;
+                    const particleY = y + Math.sin(angle) * distance - 15;
+                    
+                    // Случайная иконка монеты
+                    const coinIcons = ['💰', '🪙', '💵', '💎', '⭐'];
+                    const randomIcon = coinIcons[Math.floor(Math.random() * coinIcons.length)];
+                    
+                    particle.innerHTML = <div style="font-size: 24px; text-align: center;">${randomIcon}</div>;
+                    particle.style.left = ${particleX}px;
+                    particle.style.top = ${particleY}px;
+                    
+                    // Случайная задержка для анимации
+                    const delay = Math.random() * 0.3;
+                    particle.style.animation = coin-spin 1s ${delay}s forwards;
+                    
+                    cardContainer.appendChild(particle);
+                    setTimeout(() => particle.remove(), 1300 + delay * 1000);
+                }, i * 50);
+            }
+        }
+
+        // Анимация карты
+        function animateCard() {
+            bankCard.classList.remove('card-press');
+            void bankCard.offsetWidth;
+            bankCard.classList.add('card-press');
+            
+            // Эффект свечения
+            bankCard.classList.remove('card-glow');
+            void bankCard.offsetWidth;
+            bankCard.classList.add('card-glow');
+        }
+
+        // Анимация повышения уровня
+        function showLevelUpAnimation(newLevel) {
+            levelUpEffect.textContent = Уровень ${newLevel}!;
+            levelUpEffect.style.animation = 'none';
+            void levelUpEffect.offsetWidth;
+            levelUpEffect.style.animation = 'level-up 2s forwards';
+            
+            // Специальные эффекты для карты
+            bankCard.style.background = 'linear-gradient(135deg, #2a6644 0%, #3a8844 100%)';
+            bankCard.style.borderColor = 'rgba(0, 255, 136, 0.8)';
+            bankCard.style.boxShadow = '0 0 40px rgba(0, 255, 136, 0.6)';
+            
+            setTimeout(() => {
+                bankCard.style.background = 'linear-gradient(135deg, #1a4430 0%, #2a6644 100%)';
+                bankCard.style.borderColor = 'rgba(0, 255, 136, 0.4)';
+                bankCard.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.4)';
+            }, 1500);
+        }
+
+        // Обработка клика
+        function handleCardClick(event) {
+            const rect = bankCard.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Анимации
+            createClickAnimation(x, y);
+            animateCard();
+            
+            // Добавление XP
+            const willLevelUp = levelSystem.checkLevelUp();
+            levelSystem.addXP(levelSystem.xpPerClick);
+            
+            // Добавление монет
+            levelSystem.addCoins(levelSystem.coinsPerClick);
